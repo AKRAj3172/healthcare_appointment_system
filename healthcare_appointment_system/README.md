@@ -2,6 +2,31 @@
 
 C implementation of the DAA PBL project **Healthcare Appointment System**.
 
+## Web demo and architecture boundary
+
+The project includes a browser interface for demonstrations and UI testing:
+
+- `index.html`, `style.css`, and `script.js` form the frontend.
+- JavaScript currently provides simulated AVL-tree, hash-map, lock, and appointment behavior.
+- Browser `localStorage` provides demo persistence only.
+- The JavaScript frontend **does not execute the C implementation** and is not the production backend.
+
+The intended integration architecture is:
+
+```text
+HTML/CSS/JavaScript
+        |
+     REST API
+        |
+      C Backend
+        |
+AVL Tree + Hash Map + Mutex
+        |
+      SQLite
+```
+
+The C source and executable remain part of the project. Future frontend/API integration should call REST endpoints and leave AVL, hash-map, mutex, and SQLite responsibilities in the C backend.
+
 Central DAA concepts:
 
 - **Binary Search Tree (upgraded to a self-balancing AVL tree):** each doctor's date-specific *free* slots are keyed by minutes-from-midnight. Inorder traversal gives chronological order; the BST minimum gives the earliest free slot.
@@ -12,8 +37,8 @@ Central DAA concepts:
 
 ```bash
 gcc -O2 -Wall -Wextra healthcare_appointment.c -o healthcare -pthread
-./healthcare              # interactive menu
-./healthcare --selftest   # 49 automated correctness + concurrency checks
+./healthcare            
+./healthcare --selftest   
 ```
 
 Windows: use MinGW/MSYS2 (or WSL) with pthread support, same command with `healthcare.exe`.

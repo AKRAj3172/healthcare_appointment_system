@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Healthcare Appointment System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><svg class="ecg" viewBox="0 0 600 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30H110l10-22 14 44 10-22h90l10-14 12 28 10-14h100l10-22 14 44 10-22H600"/></svg><div class="wrap">
+<h1>Healthcare Appointment System</h1>
+<p>Book, cancel and reschedule doctor visits. Free slots live in a self-balancing search tree, records in hash maps, and a lock stops two people taking the same slot.</p>
+<nav role="tablist" id="nav"></nav>
+</div></header>
+<main class="wrap">
+
+<section id="dash" class="on">
+<div class="dashboard-heading">
+  <div><p class="eyebrow">Care operations</p><h2>Good day, care team</h2></div>
+  <span class="live-status"><i></i> System ready</span>
+</div>
+<div class="stats" id="stats"></div>
+<div class="card queue-card">
+  <div class="queue-heading"><div><p class="eyebrow">Schedule overview</p><h2>Upcoming appointments</h2></div><button class="b o s" onclick="show('appts')">View all</button></div>
+  <div class="queue" id="dqueue"></div>
+</div>
+<div class="two">
+<div class="card"><h2>Recent activity</h2><ul class="act" id="act"></ul><div class="row"><button class="b" onclick="show('book')">Book a visit</button><button class="b o" id="rst0">Reset demo data</button></div></div>
+<div class="card dsa"><h2>What runs under the hood</h2>
+<p><strong>Current mode:</strong> browser demonstration. HTML/CSS/JavaScript implement an isolated simulation; localStorage provides browser persistence.</p>
+<h3>AVL tree: free slots</h3><p>Each doctor and date keeps free slots in a balanced tree. Search, insert and delete take O(log n), even in the worst case.</p>
+<h3>Hash maps: records</h3><p>Patients, doctors and appointments are found by ID in O(1) on average, with chaining for collisions.</p>
+<h3>Mutex lock: no double booking</h3><p>Checking a slot and taking it happens as one step, so two requests can never win the same slot.</p></div>
+</div>
+</section>
+
+<section id="slots">
+<div class="card">
+<h2>Check a doctor’s free slots</h2>
+<div class="row">
+<label>Doctor<select id="sd"></select></label>
+<label>Date<input type="date" id="sdt"></label>
+<button class="b o" id="next">Find next free slot</button>
+</div>
+<div id="sinfo" class="meta"></div>
+<div id="sgrid" class="slots"></div>
+<p class="meta" id="stree"></p>
+<div class="tw"><svg id="tsvg" role="img" aria-label="Tree of free slots"></svg></div>
+</div>
+</section>
+
+<section id="book">
+<div class="card">
+<h2>Book an appointment</h2>
+<div class="row">
+<label>Patient<select id="bp"></select></label>
+<label>Doctor<select id="bd"></select></label>
+<label>Date<input type="date" id="bdt"></label>
+<label>Time<select id="bt"></select></label>
+<button class="b" id="bgo">Book appointment</button>
+</div>
+<p class="meta">A patient can’t hold two appointments at the same date and time, even with different doctors.</p>
+</div>
+</section>
+
+<section id="appts">
+<div class="card"><h2>Appointments</h2><div class="row" style="margin-bottom:.8rem"><label>Search<input id="af" placeholder="Name, doctor, date or ID"></label></div><div class="tw"><table><thead><tr><th>ID</th><th>Patient</th><th>Doctor</th><th>When</th><th>Status</th><th></th></tr></thead><tbody id="atb"></tbody></table></div></div>
+</section>
+
+<section id="patients">
+<div class="card">
+<h2>Find a patient</h2>
+<div class="row"><label>Patient ID<input id="qid" placeholder="P101"></label><button class="b o" id="qgo">Look up</button></div>
+<p class="meta" id="qres">Lookup uses a hash map: constant time on average.</p>
+</div>
+<div class="card">
+<h2>Register a patient</h2>
+<div class="row">
+<label>ID<input id="rid" placeholder="P120"></label>
+<label>Name<input id="rn"></label>
+<label>Age<input id="ra" type="number" min="0" max="120"></label>
+<label>Phone<input id="rph"></label>
+<label>Medical note<input id="ri"></label>
+<button class="b" id="rgo">Register patient</button>
+</div></div>
+<div class="card"><h2>How patient IDs are stored</h2><p class="meta" style="margin-top:0">A hash map with 7 buckets and chaining. Each ID is hashed (djb2) to a bucket; IDs that collide share a chain.</p><div id="hm"></div></div>
+<div class="card"><h2>Patients</h2><div class="tw"><table><thead><tr><th>ID</th><th>Name</th><th>Age</th><th>Phone</th><th>Medical note</th></tr></thead><tbody id="ptb"></tbody></table></div></div>
+</section>
+
+<section id="doctors"><div class="grid" id="dgrid"></div></section>
+
+<section id="demo">
+<div class="card">
+<h2>Double-booking demo</h2>
+<p class="meta" style="margin-top:0">Several patients ask for the same slot at the same moment. Run it with the lock on, then off, to see why the lock matters. The demo uses its own scratch schedule and doesn’t touch your appointments.</p>
+<div class="row">
+<label>Slot<select id="mt"></select></label>
+<label>Patients competing<select id="mn"><option>2</option><option>3</option><option>5</option></select></label>
+<label>Lock<select id="ml"><option value="1">On (safe)</option><option value="0">Off (unsafe)</option></select></label>
+<button class="b" id="mgo">Run demo</button>
+</div>
+<div class="log" id="mlog" style="margin-top:1rem">Pick a slot and press Run demo.</div>
+</div>
+</section>
+</main>
+
+<dialog id="rs"><form method="dialog">
+<h2>Reschedule <span id="rsid"></span></h2>
+<div class="row"><label>New date<input type="date" id="rsd"></label><label>New time<select id="rst"></select></label></div>
+<p class="row" style="margin-top:1rem"><button class="b" id="rsgo" value="ok">Move appointment</button><button class="b o" value="x">Keep as is</button></p>
+</form></dialog>
+<div id="toast" role="status"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

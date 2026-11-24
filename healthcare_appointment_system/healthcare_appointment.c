@@ -1201,7 +1201,7 @@ static void *chaos_thread(void *p) {
 static int run_selftest(void) {
     printf("=== SELF-TEST ===\n");
     seed_data();
-    g_race_amplifier = 1;     /* widen race windows so a missing lock cannot hide */
+    g_race_amplifier = 1;   
 
     printf("\n[1] Date / time helpers\n");
     char d[11];
@@ -1221,7 +1221,7 @@ static int run_selftest(void) {
 
     printf("\n[2] AVL tree stays balanced\n");
     BSTNode *root = NULL;
-    for (int i = 1; i <= 2000; i++) root = bst_insert(root, i, "x", 1);     /* worst case for a plain BST */
+    for (int i = 1; i <= 2000; i++) root = bst_insert(root, i, "x", 1);
     int cnt = 0, h = bst_verify(root, 0, 1000000, &cnt);
     CHECK(h > 0 && cnt == 2000 && h <= 15, "2000 sorted inserts -> valid AVL, height <= 15 (plain BST would be 2000)");
     for (int i = 1; i <= 2000; i += 2) root = bst_delete(root, i);
@@ -1280,7 +1280,7 @@ static int run_selftest(void) {
     printf("\n[6] Concurrency (real threads)\n");
     reset_state();
     add_synthetic_patients(56);
-    {   /* 56 threads, 7 slots, 8 contenders per slot */
+    {  
         pthread_t th[56];
         BookingThreadArg args[56];
         char ids[56][ID_LEN], tms[7][16];
@@ -1301,7 +1301,7 @@ static int run_selftest(void) {
         CHECK(free_slot_count("D201", "2026-11-20") == 0, "all slots consumed exactly once");
         verify_invariants("invariants hold after booking storm");
     }
-    {   /* 8 threads cancel the same appointment */
+    {   
         pthread_t th[8];
         CancelArg ca[8];
         StartGate g;
@@ -1314,7 +1314,7 @@ static int run_selftest(void) {
         CHECK(wins == 1 && free_slot_count("D201", "2026-11-20") == 1, "8 concurrent cancels -> exactly one succeeds, slot restored once");
     }
     reset_state();
-    {   /* one patient, three doctors, same time: only one may win */
+    {   
         pthread_t th[3];
         BookingThreadArg args[3];
         const char *docs[3] = {"D201", "D202", "D204"};
@@ -1334,7 +1334,7 @@ static int run_selftest(void) {
     }
     reset_state();
     add_synthetic_patients(40);
-    {   /* chaos: random book / cancel / reschedule from 12 threads */
+    {   
         pthread_t th[12];
         ChaosArg ca[12];
         StartGate g;
@@ -1354,7 +1354,6 @@ static int run_selftest(void) {
     return checks_failed ? 1 : 0;
 }
 
-/* ----------------------------- MAIN ----------------------------- */
 
 int main(int argc, char **argv) {
     if (argc > 1 && strcmp(argv[1], "--selftest") == 0) return run_selftest();
