@@ -1,0 +1,35 @@
+SAMPLE DEMONSTRATION  (verified output from the v2 program)
+
+1) Start program:  ./healthcare
+2) Choose 5
+   Doctor ID: D201
+   Date: 2026-11-20 (Friday)
+
+   Available slots (AVL/BST inorder):
+   09:00 AM, 10:00 AM, 11:00 AM, 12:00 PM, 02:00 PM, 03:00 PM, 04:00 PM
+   Free slots: 7 of 7 | tree height: 3
+
+3) Choose 6
+   Patient ID: P101
+   Doctor ID: D201
+   Date: 2026-11-20
+   Time: 2:00 PM          (accepted, normalised to 02:00 PM)
+
+   SUCCESS: Appointment confirmed.
+   Appointment ID: APT501
+
+4) Choose 5 again for D201 / 2026-11-20.
+   02:00 PM is now absent because its node was deleted. Free slots: 6 of 7.
+
+5) Choose 7 and cancel APT501.
+   SUCCESS: APT501 cancelled; slot 02:00 PM restored to BST.
+
+6) Choose 10.
+   Two patients simultaneously request 10:00 AM (released together by a start gate).
+   Exactly one is SUCCESS and the other is REJECTED.
+   Run it again: it now picks the earliest free slot, so state stays consistent.
+
+7) Extras: option 8 (reschedule - busy slot is rejected and the original is preserved),
+   11 (a patient's appointments), 12 (doctor's next available slot), 0 (exit).
+
+8) Automated checks:  ./healthcare --selftest   ->  49 passed, 0 failed
